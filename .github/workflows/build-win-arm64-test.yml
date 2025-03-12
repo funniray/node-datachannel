@@ -31,7 +31,8 @@ jobs:
 
       - name: Add arguments required for openssl on arm
         run: |
-          echo "set(VCPKG_C_FLAGS `"-DNO_INTERLOCKEDOR64`")`nset(VCPKG_CXX_FLAGS `"-DNO_INTERLOCKEDOR64`")" | out-file .\arm64-windows-static-openssl.cmake -append -Encoding utf8
+          echo "Appending custom c_flags to $Env:VCPKG_INSTALLATION_ROOT\triplets\community\arm64-windows-static.cmake"
+          echo "set(VCPKG_C_FLAGS `"-DNO_INTERLOCKEDOR64`")`nset(VCPKG_CXX_FLAGS `"-DNO_INTERLOCKEDOR64`")" | out-file "$Env:VCPKG_INSTALLATION_ROOT\triplets\community\arm64-windows-static.cmake" -append -Encoding utf8
         shell: pwsh
 
       - name: Install OpenSSL (Static) for Windows ARM64
