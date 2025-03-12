@@ -19,6 +19,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # nmake isn't parallel, so we use https://wiki.qt.io/Jom instead
+      - name: Install Jom
+        run: |
+          mkdir jom
+          curl.exe -L https://download.qt.io/official_releases/jom/jom_1_1_4.zip -o jom.zip
+          Expand-Archive -LiteralPath jom.zip -DestinationPath jom
+          rm jom.zip
+        shell: pwsh
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
@@ -37,12 +46,14 @@ jobs:
         working-directory: openssl
         env:
           CFLAGS: -DNO_INTERLOCKEDOR64
+          CL: /FS
 
       - name: Build OpenSSL
-        run: nmake
+        run: ..\jom\jom.exe
         working-directory: openssl
         env:
           CFLAGS: -DNO_INTERLOCKEDOR64
+          CL: /FS
 
       - name: Install Node dependencies
         run: npm install --ignore-scripts
