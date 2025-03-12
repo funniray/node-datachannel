@@ -29,16 +29,10 @@ jobs:
         with:
           arch: amd64_arm64  # Sets up cross-compilation from x64 to ARM64
 
-      - name: Add arguments required for openssl on arm
-        run: |
-          echo "set(VCPKG_C_FLAGS `"-DNO_INTERLOCKEDOR64`")`nset(VCPKG_CXX_FLAGS `"-DNO_INTERLOCKEDOR64`")" | out-file "$Env:VCPKG_INSTALLATION_ROOT\triplets\community\arm64-windows-static.cmake" -append -Encoding utf8
-          echo "Set custom c_flags to $Env:VCPKG_INSTALLATION_ROOT\triplets\community\arm64-windows-static.cmake"
-        shell: pwsh
-
       - name: Install OpenSSL (Static) for Windows ARM64
         run: |
-          %VCPKG_INSTALLATION_ROOT%\vcpkg install openssl:arm64-windows-static
-        shell: cmd
+          $Env:VCPKG_INSTALLATION_ROOT\vcpkg install openssl:arm64-windows-static-custom --overlay-triplets="$pwd\cmake\vcpkg_triplet_overlay"
+        shell: pwsh
 
       - name: Install node dependencies
         run: |
@@ -49,8 +43,8 @@ jobs:
 
       - name: Build
         run: |
-          node_modules\.bin\cmake-js build -A arm64 -a arm64 --CDCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
-        shell: cmd
+          .\node_modules\.bin\cmake-js build -A arm64 -a arm64 --CDCMAKE_TOOLCHAIN_FILE="$Env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=arm64-windows-static-custom --CDVCPKG_OVERLAY_TRIPLETS="$pwd\cmake\vcpkg_triplet_overlay"
+        shell: pwsh
 
 
       - uses: actions/upload-artifact@v4
