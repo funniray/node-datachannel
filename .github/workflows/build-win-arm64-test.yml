@@ -43,13 +43,13 @@ jobs:
       - name: Install node dependencies
         run: |
           npm install --ignore-scripts
-#          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
+#          node_modules\.bin\prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
         shell: cmd
         
 
       - name: Build
         run: |
-          node_modules/.bin/cmake-js build -A arm64 -a arm64 -G Ninja --CDCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
+          node_modules\.bin\cmake-js build -A arm64 -a arm64 --CDCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
         shell: cmd
 
 
