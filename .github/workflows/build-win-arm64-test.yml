@@ -29,24 +29,36 @@ jobs:
         with:
           arch: amd64_arm64  # Sets up cross-compilation from x64 to ARM64
 
-      - name: Install vcpkg
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
-          cd C:\vcpkg
-          .\bootstrap-vcpkg.bat
-        shell: cmd
-
-      - name: Install OpenSSL (Static) for Windows ARM64
-        run: |
-          C:\vcpkg\vcpkg install openssl:arm64-windows-static
-        shell: cmd
-
-      - name: Build
-        run: |
-          npm install --ignore-scripts
-          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE=c:\vcpkg\scripts\buildsystems\vcpkg.cmake --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
-
-      - name: Upload
-        run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
+      - name: Clone OpenSSL
+        run: git clone https://github.com/openssl/openssl.git --branch openssl-3.4.1 --depth 1 --single-branch
+      
+      - name: Configure OpenSSL
+        run: perl Configure VC-WIN64-CLANGASM-ARM no-shared
+        working-directory: openssl
         env:
-          CI: true
+          CFLAGS: -DNO_INTERLOCKEDOR64
+
+      - name: Build OpenSSL
+        run: nmake
+        working-directory: openssl
+        env:
+          CFLAGS: -DNO_INTERLOCKEDOR64
+
+      - name: Install Node dependencies
+        run: npm install --ignore-scripts
+
+      - name: Compile
+        run: |
+          .\node_modules\.bin\cmake-js -A arm64 -a arm64 --CDOPENSSL_ROOT_DIR="$pwd\openssl"
+#          .\node_modules\.bin\prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDOPENSSL_ROOT_DIR="$pwd\openssl"
+        shell: pwsh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: win-arm64
+          path: build/Release/*
+
+      # - name: Upload
+      #   run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
+      #   env:
+      #     CI: true
