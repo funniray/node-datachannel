@@ -31,7 +31,7 @@ jobs:
 
       - name: Install OpenSSL (Static) for Windows ARM64
         run: |
-          $Env:VCPKG_INSTALLATION_ROOT\vcpkg install openssl:arm64-windows-static-custom --overlay-triplets="$pwd\cmake\vcpkg_triplet_overlay"
+          & "$Env:VCPKG_INSTALLATION_ROOT\vcpkg" install openssl:arm64-windows-static-custom --overlay-triplets="$pwd\cmake\vcpkg_triplet_overlay"
         shell: pwsh
 
       - name: Install node dependencies
